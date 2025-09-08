@@ -1,3 +1,3 @@
 NuGet packages:
-UTF.Unknown
+UTF.Unknown,
 System.Text.Encoding.CodePages
