@@ -17,21 +17,21 @@ namespace Codirovka
             comboTarget.SelectedIndex = 3; //utf8 standart
         }
 
-        private string DetectEncoding(string path)
+        private Encoding DetectEncoding(string path)
         {
             try
             {
                 var result = CharsetDetector.DetectFromFile(path);
                 if (result.Detected != null && result.Detected.Confidence > 0.5f) 
                 {
-                    return result.Detected.EncodingName ?? "UTF-8";  
+                    return result.Detected.Encoding ?? Encoding.UTF8;  
                 }
-                return "Кодировка неизвестна";
+                return Encoding.UTF8;
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"Ошибка определения: {ex.Message}");
-                return "UTF-8";
+                return Encoding.UTF8;
             }
         }
         private void buttonSelect_Click(object sender, EventArgs e)
@@ -42,8 +42,11 @@ namespace Codirovka
             {
                 filePath = dialog.FileName;
                 textFilePath.Text = filePath;
-                string detected = DetectEncoding(filePath);
-                labelDetect.Text = $"Обнаружена кодировка: {detected}";
+                Encoding detected = DetectEncoding(filePath);
+                string detectedName = detected.EncodingName ?? "Кодировка неизвестна";
+                //MessageBox.Show($"Обнаружена кодировка: {detectedName}, CodePage: {detected.CodePage}");
+                if (detected.CodePage == 10007) detectedName = "MacCyrillic";
+                labelDetect.Text = $"Обнаружена кодировка: {detectedName}";
                 labelStatus.Text = "Ожидание конвертации";
             }
         }
@@ -60,53 +63,8 @@ namespace Codirovka
                 MessageBox.Show("Выберите новую кодировку");
                 return;
             }
-            string detectedName = labelDetect.Text.Replace("Обнаружена кодировка: ", "");
+            Encoding sourceEnc = DetectEncoding(filePath);
             string encodingName = comboTarget.SelectedItem.ToString();
-            MessageBox.Show($"DetectedName: {detectedName}, EncodingName: {encodingName}");
-            int codePage;
-            if (detectedName == "кодировка неизвестна")  // Исправил проверку на неизвестную кодировку (ToLower() учтено)
-            {
-                codePage = 65001;  // Fallback UTF-8
-            }
-            else
-            {
-                switch (detectedName)
-                {
-                    case "ibm866":
-                    case "cp866":
-                    case "866":
-                        codePage = 866;
-                        break;
-                    case "windows-1251":
-                    case "cp1251":
-                    case "1251":
-                        codePage = 1251;
-                        break;
-                    case "x-mac-cyrillic":
-                    case "maccyrillic":
-                    case "10007":
-                        codePage = 10007;
-                        break;
-                    case "utf-8":
-                        codePage = 65001;
-                        break;
-                    default:
-                        codePage = 65001;
-                        MessageBox.Show($"Неизвестное имя кодировки: {detectedName}. Используем UTF-8 (65001).");
-                        break;
-                }
-            }
-                Encoding sourceEnc;
-            try
-            {
-                sourceEnc = Encoding.GetEncoding(codePage);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Не удалось получить исходную кодировку. Используем UTF-8.");
-                sourceEnc = Encoding.UTF8;
-            }
-
             Encoding newEnc = Encoding.UTF8;
             try
             {

@@ -34,6 +34,7 @@
             labelStatus = new Label();
             buttonSelect = new Button();
             buttonConvert = new Button();
+            label1 = new Label();
             SuspendLayout();
             // 
             // textFilePath
@@ -89,11 +90,21 @@
             buttonConvert.UseVisualStyleBackColor = true;
             buttonConvert.Click += buttonConvert_Click;
             // 
+            // label1
+            // 
+            label1.AutoSize = true;
+            label1.Location = new Point(48, 48);
+            label1.Name = "label1";
+            label1.Size = new Size(202, 15);
+            label1.TabIndex = 6;
+            label1.Text = "Для начала работы выберите файл";
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(800, 450);
+            Controls.Add(label1);
             Controls.Add(buttonConvert);
             Controls.Add(buttonSelect);
             Controls.Add(labelStatus);
@@ -114,5 +125,6 @@
         private Label labelStatus;
         private Button buttonSelect;
         private Button buttonConvert;
+        private Label label1;
     }
 }
